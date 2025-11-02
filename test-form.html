@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quote Test Form</title>
+  </head>
+  <body>
+    <h1>Send a Test Quote</h1>
+    <form id="contactForm">
+      <input name="name" placeholder="Name" required><br><br>
+      <input name="email" placeholder="Email" required><br><br>
+      <input name="phone" placeholder="Phone"><br><br>
+      <textarea name="message" placeholder="Your message"></textarea><br><br>
+      <button type="submit">Send</button>
+    </form>
+    <p id="formStatus"></p>
+
+    <script>
+      document.getElementById('contactForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('formStatus');
+        status.textContent = 'Sending...';
+        const data = Object.fromEntries(new FormData(e.target));
+        try {
+          const res = await fetch('http://localhost:8080/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const json = await res.json();
+          status.textContent = json.ok ? '✅ Email sent successfully!' : '❌ Error: ' + json.error;
+        } catch (err) {
+          status.textContent = '❌ Network error — please check server.';
+        }
+      });
+    </script>
+  </body>
+</html>
