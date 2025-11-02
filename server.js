@@ -7,16 +7,20 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const ORIGINS = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+const ORIGINS = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
 
 app.use(cors({
   origin: function (origin, cb) {
-    if (!origin || origin === 'null') return cb(null, true); // allow file:// and tools
-    if (ORIGINS.length === 0 || ORIGINS.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true);        // allow server-to-server/tools
+    if (ORIGINS.includes(origin)) return cb(null, true);
     return cb(new Error('Not allowed by CORS'), false);
   },
   methods: ['POST', 'OPTIONS']
 }));
+app.options('*', cors());
 
 
 app.get('/', (req, res) => res.json({ ok: true, message: 'Shareef Construction API is running' }));
